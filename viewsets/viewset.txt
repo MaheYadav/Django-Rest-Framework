@@ -1,0 +1,109 @@
+https://levelup.gitconnected.com/django-rest-framework-viewsets-2f3283dda518
+login:Mahi
+Password:1188
+ViewSets
+From the Django rest-framework docs:
+
+A ViewSet class is simply a type of class-based View, that does not provide any method handlers such as .get() or .post(), and instead provides actions such as .list() and .create().
+
+There are four different types of ViewSets, namely,
+
+ViewSet
+GenericViewSet
+ModelViewSet
+ReadOnlyModelViewSet
+
+For example, this viewset can perform all CRUD operations.
+
+class BookViewSet(viewsets.ViewSet):
+    def list(self, request):
+        pass
+
+    def create(self, request):
+        pass
+
+    def retrieve(self, request, pk=None):
+        pass
+
+    def update(self, request, pk=None):
+        pass
+
+    def partial_update(self, request, pk=None):
+        pass
+
+    def destroy(self, request, pk=None):
+        pass
+
+The action handlers correspond to different HTTP methods:
+
+list -GET
+create-POST
+retrieve-GET a specific item
+update-POST a specific item
+partial_update- PATCH a specific item
+destroy — DELETE
+
+
+
+ViewSet Class
+The ViewSet class inherits from APIView, and, It does not include any actions by default. For example
+
+
+from rest_framework import viewsets
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from viewsetapp.models import UserRegistration
+from viewsetapp.serializer import UserSerializer
+# Create your views here.
+
+
+class UserViewSet(viewsets.ViewSet):
+    def list(self, request):
+        queryset = UserRegistration.objects.all()
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = UserRegistration.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+
+GenericViewSet Class
+The GenericViewSet class inherits from GenericAPIView and, therefore, will inherit all the attributes of the GenericAPIView such as get_object, get_queryset methods, e.t.c.
+It does not include any actions by default.
+
+
+
+class GenericViewSet(ViewSetMixin, generics.GenericAPIView):
+    def get_queryset(self):
+        pass
+
+
+ModelViewSet Class
+The ViewSet class inherits from GenericAPIView, and includes the actions namely .list(), .retrieve(), .create(), .update(), and .destroy().
+It also takes the serializer class and a queryset as attributes
+
+
+from rest_framework import viewsets
+from .models import Book
+from .serializers import BookSerializer
+
+# Create your views here.
+
+class BookViewSet(viewsets.ModelViewSet):
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
+
+
+ReadOnlyModelViewSet Class
+The ReadOnlyModelViewSet just like the name suggests only provides read-only actions ( .list() and .retrieve(). ).
+It inherits from GenericAPIView and will take at least a queryset and a serializer class as attributes
+
+
+from rest_framework import viewsets
+class BookViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
